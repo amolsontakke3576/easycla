@@ -12,7 +12,7 @@ import { RolesService } from '../../services/roles.service';
 })
 export class AuthPage {
   userRoles: any;
-  gerritId: string;
+  projectId: string;
   claType: string;
 
   constructor(
@@ -21,7 +21,7 @@ export class AuthPage {
     public authService: AuthService,
     public rolesService: RolesService
   ) {
-    this.gerritId = localStorage.getItem('gerritId');
+    this.projectId = localStorage.getItem('projectId');
     this.claType = localStorage.getItem('gerritClaType');
   }
 
@@ -32,11 +32,11 @@ export class AuthPage {
         .then((userRoles) => {
           if (userRoles.isAuthenticated) {
             if (this.claType == 'ICLA') {
-              this.navCtrl.setRoot('ClaGerritIndividualPage', { gerritId: this.gerritId });
+              this.navCtrl.setRoot('ClaGerritIndividualPage', { projectId: this.projectId });
             } else if (this.claType == 'CCLA') {
-              this.navCtrl.setRoot('ClaGerritCorporatePage', { gerritId: this.gerritId });
+              this.navCtrl.setRoot('ClaGerritCorporatePage', { projectId: this.projectId });
             }
-            localStorage.removeItem('gerritId');
+            localStorage.removeItem('projectId');
             localStorage.removeItem('gerritClaType');
           } else {
             this.navCtrl.setRoot('LoginPage');

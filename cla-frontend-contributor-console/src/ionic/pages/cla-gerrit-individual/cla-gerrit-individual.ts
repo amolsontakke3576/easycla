@@ -12,23 +12,20 @@ import { Restricted } from '../../decorators/restricted';
   roles: ['isAuthenticated']
 })
 @IonicPage({
-  segment: 'cla/gerrit/project/:gerritId/individual'
+  segment: 'cla/gerrit/project/:projectId/individual'
 })
 @Component({
   selector: 'cla-gerrit-individual',
   templateUrl: 'cla-gerrit-individual.html'
 })
 export class ClaGerritIndividualPage {
-  gerritId: string;
   projectId: string;
   project: any;
-  gerrit: any;
   userId: string;
   user: any;
   signatureIntent: any;
   activeSignatures: boolean = true; // we assume true until otherwise
   signature: any;
-
   userRoles: any;
 
   constructor(
@@ -39,8 +36,8 @@ export class ClaGerritIndividualPage {
     private authService: AuthService,
   ) {
     this.getDefaults();
-    this.gerritId = navParams.get('gerritId');
-    localStorage.setItem('gerritId', this.gerritId);
+    this.projectId = navParams.get('projectId');
+    localStorage.setItem('projectId', this.projectId);
     localStorage.setItem('gerritClaType', 'ICLA');
   }
 
@@ -56,7 +53,7 @@ export class ClaGerritIndividualPage {
   }
 
   ngOnInit() {
-    this.getProject(this.gerritId);
+    this.getProjectDetails();
   }
 
   ionViewCanEnter() {
@@ -68,23 +65,17 @@ export class ClaGerritIndividualPage {
 
   ngAfterViewInit() { }
 
-  getProject(gerritId) {
-    //retrieve projectId from this Gerrit
-    this.claService.getGerrit(gerritId).subscribe((gerrit) => {
-      this.gerrit = gerrit;
-      this.projectId = gerrit.project_id;
+  getProjectDetails() {
+    //retrieve project info with project Id
+    this.claService.getProjectWithAuthToken(this.projectId).subscribe((project) => {
+      this.project = project;
 
-      //retrieve project info with project Id
-      this.claService.getProjectWithAuthToken(gerrit.project_id).subscribe((project) => {
-        this.project = project;
+      // retrieve userInfo from auth0 service
+      this.claService.postOrGetUserForGerrit().subscribe((user) => {
+        this.userId = user.user_id;
 
-        // retrieve userInfo from auth0 service
-        this.claService.postOrGetUserForGerrit().subscribe((user) => {
-          this.userId = user.user_id;
-
-          // get signatureIntent object, similar to the Github flow.
-          this.postSignatureRequest();
-        });
+        // get signatureIntent object, similar to the Github flow.
+        this.postSignatureRequest();
       });
     });
   }

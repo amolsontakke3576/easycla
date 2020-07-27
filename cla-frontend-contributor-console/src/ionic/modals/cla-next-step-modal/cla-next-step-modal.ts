@@ -83,7 +83,8 @@ export class ClaNextStepModal {
         // since all Gerrit Instances in the response will be under the same CLA Group.
         let gerrit = gerrits[0];
         this.navCtrl.push('ClaGerritIndividualPage', {
-          gerritId: gerrit.gerrit_id
+          // gerritId: gerrit.gerrit_id
+          projectId: gerrit.project_id
         });
       }
     });

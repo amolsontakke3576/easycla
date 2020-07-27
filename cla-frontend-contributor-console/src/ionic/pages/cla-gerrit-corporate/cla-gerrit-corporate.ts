@@ -11,7 +11,7 @@ import { Restricted } from '../../decorators/restricted';
   roles: ['isAuthenticated']
 })
 @IonicPage({
-  segment: 'cla/gerrit/project/:gerritId/corporate'
+  segment: 'cla/gerrit/project/:projectId/corporate'
 })
 @Component({
   selector: 'cla-gerrit-corporate',
@@ -21,7 +21,6 @@ import { Restricted } from '../../decorators/restricted';
 export class ClaGerritCorporatePage {
   loading: any;
   projectId: string;
-  gerritId: string;
   userId: string;
   signature: string;
   companies: any;
@@ -34,9 +33,9 @@ export class ClaGerritCorporatePage {
     private claService: ClaService,
     private authService: AuthService,
   ) {
-    this.gerritId = navParams.get('gerritId');
+    this.projectId = navParams.get('projectId');
     this.getDefaults();
-    localStorage.setItem('gerritId', this.gerritId);
+    localStorage.setItem('projectId', this.projectId);
     localStorage.setItem('gerritClaType', 'CCLA');
   }
 
@@ -50,7 +49,6 @@ export class ClaGerritCorporatePage {
   ngOnInit() {
     this.getCompanies();
     this.getUserInfo();
-    this.getProject(this.gerritId);
   }
 
   ionViewCanEnter() {
@@ -65,13 +63,11 @@ export class ClaGerritCorporatePage {
   }
 
   getCompanies() {
-    this.claService.getGerrit(this.gerritId).subscribe((gerrit) => {
-      this.claService.getAllCompanies().subscribe((response) => {
-        if (response) {
-          this.companies = response;
-        }
-        this.loading.companies = false;
-      });
+    this.claService.getAllCompanies().subscribe((response) => {
+      if (response) {
+        this.companies = response;
+      }
+      this.loading.companies = false;
     });
   }
 
@@ -151,12 +147,6 @@ export class ClaGerritCorporatePage {
       userId: this.userId,
       companyId: company.company_id,
       gitService: 'Gerrit'
-    });
-  }
-
-  getProject(gerritId) {
-    this.claService.getGerrit(gerritId).subscribe((gerrit) => {
-      this.projectId = gerrit.project_id;
     });
   }
 }
