@@ -63,21 +63,16 @@ export class ClaConfigureGithubRepositoriesModal {
     //console.log('Received response: ');
     // console.log(data);
     this.assignedRepositories = data['repositories'];
+
     this.orgAndRepositories = data['orgs_and_repos']
       .map((organization) => {
         this.loading.activateSpinner = false;
         organization.repositories.map((repository) => {
-          repository.status = 'free';
           repository.repository_organization_name = organization.organization_name;
-
           if (this.isTaken(repository)) {
             repository.status = 'taken';
-
-            if (this.isAssignedToLocalContractGroup(repository)) {
-              repository.status = 'assigned';
-            }
+            this.isAssignedToLocalContractGroup(repository);
           }
-
           return repository;
         });
 
@@ -86,6 +81,7 @@ export class ClaConfigureGithubRepositoriesModal {
       .sort((a, b) => {
         return a.organization_name.trim().localeCompare(b.organization_name.trim());
       });
+    console.log(this.orgAndRepositories)
     this.loading.repositories = false;
   }
 
@@ -94,7 +90,14 @@ export class ClaConfigureGithubRepositoriesModal {
   }
 
   isAssignedToLocalContractGroup(repository) {
-    return String(repository.repository_project_id) === String(this.claProjectId);
+    if (String(repository.repository_project_id) === String(this.claProjectId)) {
+      console.log(repository.enabled)
+      if (repository.enabled) {
+        repository.status = 'assigned';
+      } else {
+        repository.status = 'free';
+      }
+    }
   }
 
   isTaken(repository) {

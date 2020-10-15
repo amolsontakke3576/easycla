@@ -48,7 +48,7 @@
                   Add
                 </button>
                 <button type="button" ion-button color="light" size="small" class="remove"
-                  *ngIf="repository.status === 'assigned' && !loading.activateSpinner"
+                  *ngIf="repository.status === 'assigned'"
                   (click)="removeRepository(repository)">
                   Remove
                 </button>
