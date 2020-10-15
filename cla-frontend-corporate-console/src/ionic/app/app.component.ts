@@ -21,10 +21,7 @@ import { EnvConfig } from '../services/cla.env.utils';
 })
 export class MyApp {
   @ViewChild(Nav) nav: Nav;
-
   rootPage: any = AuthPage;
-
-  userRoles: any;
   pages: Array<{
     icon?: string;
     access: boolean;
@@ -76,23 +73,12 @@ export class MyApp {
 
   getDefaults() {
     this.pages = [];
-    this.userRoles = this.rolesService.userRoles;
     this.regeneratePagesMenu();
-  }
-
-  ngOnInit() {
-    this.rolesService.getUserRolesPromise().then((userRoles) => {
-      this.userRoles = userRoles;
-      this.regeneratePagesMenu();
-    });
   }
 
   initializeApp() {
     this.platform.ready().then(() => {
       // Okay, so the platform is ready and our plugins are available.
-      // Here you can do any higher level native things you might need.
-      // this.statusBar.styleDefault();
-      // this.splashScreen.hide();
     });
   }
 

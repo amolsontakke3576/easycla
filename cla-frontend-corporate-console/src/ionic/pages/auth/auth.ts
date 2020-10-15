@@ -29,21 +29,26 @@ export class AuthPage {
   ) { }
 
   ionViewDidEnter() {
-    console.log('token ' + this.navParams.get('idToken'))
-    setTimeout(() => {
-      this.rolesService
-        .getUserRolesPromise()
-        .then((userRoles) => {
-          if (AuthPage.hasAccess(userRoles)) {
-            this.navCtrl.setRoot('CompaniesPage');
-          } else {
-            this.redirectToLogin();
-          }
-        })
-        .catch((error) => {
-          this.redirectToLogin();
-        });
-    }, 2000);
+    // console.log('token ' + this.navParams.get('idToken'))
+    // setTimeout(() => {
+    //   this.rolesService
+    //     .getUserRolesPromise()
+    //     .then((userRoles) => {
+    //       if (AuthPage.hasAccess(userRoles)) {
+    //         this.navCtrl.setRoot('CompaniesPage');
+    //       } else {
+    //         this.redirectToLogin();
+    //       }
+    //     })
+    //     .catch((error) => {
+    //       this.redirectToLogin();
+    //     });
+    // }, 2000);
+    if (this.authService.isAuthenticated()) {
+      this.navCtrl.setRoot('CompaniesPage');
+    } else {
+      this.redirectToLogin();
+    }
   }
 
   redirectToLogin() {
@@ -52,9 +57,5 @@ export class AuthPage {
     } else {
       this.navCtrl.setRoot('LoginPage');
     }
-  }
-
-  private static hasAccess(userRoles: any): boolean {
-    return userRoles.isAuthenticated;
   }
 }
