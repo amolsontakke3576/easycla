@@ -21,6 +21,9 @@ export class AuthService {
   auth0Options = {
     clientId: EnvConfig['auth0-clientId'],
     domain: EnvConfig['auth0-domain'],
+    callbackUrl: window.location.origin,
+    logoutUrl: window.location.origin,
+    useRefreshTokens: true
   };
 
   currentHref = window.location.href;
@@ -30,7 +33,9 @@ export class AuthService {
   auth0Client$ = (from(
     createAuth0Client({
       domain: this.auth0Options.domain,
-      client_id: this.auth0Options.clientId
+      client_id: this.auth0Options.clientId,
+      redirect_uri: this.auth0Options.callbackUrl,
+      useRefreshTokens: this.auth0Options.useRefreshTokens
     })
   ) as Observable<Auth0Client>).pipe(
     shareReplay(1), // Every subscription receives the same shared value
@@ -47,7 +52,7 @@ export class AuthService {
     concatMap((client: Auth0Client) => from(client.isAuthenticated())),
     tap((res: any) => {
       // *info: once isAuthenticated$ responses , SSO sessiong is loaded
-      this.loading$.next(false);
+      // this.loading$.next(false);
       this.loggedIn = res;
     })
   );
@@ -94,6 +99,12 @@ export class AuthService {
     );
   }
 
+  checkSession() {
+    return this.auth0Client$.pipe(
+      concatMap((client: Auth0Client) => from(client.checkSession()))
+    );
+  }
+
   private localAuthSetup() {
     // This should only be called on app initialization
     // Set up local authentication streams
@@ -102,12 +113,28 @@ export class AuthService {
         if (loggedIn) {
           // If authenticated, get user and set in app
           // NOTE: you could pass options here if needed
+          this.loading$.next(false);
           return this.getUser$();
         }
         this.auth0Client$
-          .pipe(concatMap((client: Auth0Client) => from(client.checkSession())))
-          .subscribe((data) => { });
-        this.userProfileSubject$.next(null);
+          .pipe(concatMap((client: Auth0Client) => from(client.getTokenSilently())),
+            concatMap(() => this.getUser$()),
+            concatMap((user) => {
+              console.log(' user ? ', { user });
+              if (user) {
+                return this.isAuthenticated$;
+              }
+              return of(null);
+            }),
+            catchError((error) => {
+              console.log('getTokenSilently > getUser$ ', { error });
+              // *info: by pass error, no needed, it is login_required
+              return of(null);
+            })
+          )
+          .subscribe(() => {
+            this.loading$.next(false);
+          });
         // If not authenticated, return stream that emits 'false'
         return of(loggedIn);
       })
