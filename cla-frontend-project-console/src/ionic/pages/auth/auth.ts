@@ -32,6 +32,7 @@ export class AuthPage implements AfterViewInit {
     });
 
     this.authService.userProfile$.subscribe(user => {
+      console.log('user ' + user);
       if (user !== undefined) {
         if (user) {
           this.lfxHeaderService.setUserInLFxHeader();

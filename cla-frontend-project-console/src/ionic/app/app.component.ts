@@ -114,6 +114,7 @@ export class MyApp {
       'src',
       EnvConfig['lfx-footer']
     );
+    script.setAttribute('async', 'true');
     document.head.appendChild(script);
   }
 
