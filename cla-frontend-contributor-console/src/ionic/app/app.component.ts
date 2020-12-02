@@ -34,7 +34,7 @@ export class MyApp {
     private lfxHeaderService: LfxHeaderService
   ) {
     this.initializeApp();
-
+    localStorage.setItem('redirect', this.getParameterByName('redirect'));
     // Determine if we're running in a local services (developer) mode - the USE_LOCAL_SERVICES environment variable
     // will be set to 'true', otherwise we're using normal services deployed in each environment
     const localServicesMode = (process.env.USE_LOCAL_SERVICES || 'false').toLowerCase() === 'true';
@@ -75,5 +75,15 @@ export class MyApp {
   openPage(page) {
     // Set the nav root so back button doesn't show
     this.nav.setRoot(page.component);
+  }
+
+  getParameterByName(name, url = window.location.href) {
+    console.log(url);
+    name = name.replace(/[\[\]]/g, '\\$&');
+    var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
+      results = regex.exec(url);
+    if (!results) return null;
+    if (!results[2]) return '';
+    return decodeURIComponent(results[2].replace(/\+/g, ' '));
   }
 }

@@ -226,8 +226,17 @@ export class ClaEmployeeRequestAccessModal {
       subTitle: message,
       buttons: ['Dismiss']
     });
-    alert.onDidDismiss(() => this.dismiss());
+    alert.onDidDismiss(() => this.redirectBack());
     alert.present();
+  }
+
+  redirectBack() {
+    const redirectUrl = localStorage.getItem('redirect');
+    if (redirectUrl !== null) {
+      window.open(redirectUrl, '_self');
+    } else {
+      this.dismiss();
+    }
   }
 
   emailSentError(error) {
@@ -238,7 +247,7 @@ export class ClaEmployeeRequestAccessModal {
       subTitle: message,
       buttons: ['Dismiss']
     });
-    alert.onDidDismiss(() => this.dismiss());
+    alert.onDidDismiss(() => this.redirectBack());
     alert.present();
   }
 
